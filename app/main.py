@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from database.mongodb import MongoDB
 from config.development import config
-from model.student import createStudentModel, updateStudentModel
+from model.Tree import createShoptreeModel, updateShoptreeModel
 
 mongo_config = config["mongo_config"]
 mongo_db = MongoDB(
@@ -31,15 +31,15 @@ app.add_middleware(
 )
 
 
-@app.get("/")
+@app.get("trees/")
 def index():
-    return JSONResponse(content={"message": "Student Info"}, status_code=200)
+    return JSONResponse(content={"message": "Trees Info"}, status_code=200)
 
 
-@app.get("/students/")
-def get_students(
+@app.get("/trees/")
+def get_trees(
     sort_by: Optional[str] = None,
-    order: Optional[str] = Query(None, min_length=3, max_length=4),
+    order: Optional[str] = Query(None, min_length=3, max_length=3),
 ):
 
     try:
@@ -53,15 +53,15 @@ def get_students(
     )
 
 
-@app.get("/students/{student_id}")
-def get_students_by_id(student_id: str = Path(None, min_length=10, max_length=10)):
+@app.get("/trees/{tree_id}")
+def get_trees_by_id(tree_id: str = Path(None, min_length=3, max_length=3)):
     try:
-        result = mongo_db.find_one(student_id)
+        result = mongo_db.find_one(tree_id)
     except:
         raise HTTPException(status_code=500, detail="Something went wrong !!")
 
     if result is None:
-        raise HTTPException(status_code=404, detail="Student Id not found !!")
+        raise HTTPException(status_code=404, detail="tree Id not found !!")
 
     return JSONResponse(
         content={"status": "OK", "data": result},
@@ -69,10 +69,10 @@ def get_students_by_id(student_id: str = Path(None, min_length=10, max_length=10
     )
 
 
-@app.post("/students")
-def create_books(student: createStudentModel):
+@app.post("/trees")
+def create_trees(tree: createShoptreeModel):
     try:
-        student_id = mongo_db.create(student)
+        tree_id = mongo_db.create(tree)
     except:
         raise HTTPException(status_code=500, detail="Something went wrong !!")
 
@@ -80,35 +80,35 @@ def create_books(student: createStudentModel):
         content={
             "status": "ok",
             "data": {
-                "student_id": student_id,
+                "tree_id": tree_id,
             },
         },
         status_code=201,
     )
 
 
-@app.patch("/students/{student_id}")
-def update_books(
-    student: updateStudentModel,
-    student_id: str = Path(None, min_length=10, max_length=10),
+@app.patch("/trees/{tree_id}")
+def update_trees(
+    tree: updateShoptreeModel,
+    tree_id: str = Path(None, min_length=3, max_length=3),
 ):
-    print("student", student)
+    print("tree", tree)
     try:
-        updated_student_id, modified_count = mongo_db.update(student_id, student)
+        updated_tree_id, modified_count = mongo_db.update(tree_id, tree)
     except:
         raise HTTPException(status_code=500, detail="Something went wrong !!")
 
     if modified_count == 0:
         raise HTTPException(
             status_code=404,
-            detail=f"Student Id: {updated_student_id} is not update want fields",
+            detail=f"Tree Id: {updated_tree_id} is not update want fields",
         )
 
     return JSONResponse(
         content={
             "status": "ok",
             "data": {
-                "student_id": updated_student_id,
+                "tree_id": updated_tree_id,
                 "modified_count": modified_count,
             },
         },
@@ -116,23 +116,23 @@ def update_books(
     )
 
 
-@app.delete("/students/{student_id}")
-def delete_book_by_id(student_id: str = Path(None, min_length=10, max_length=10)):
+@app.delete("/trees/{tree_id}")
+def delete_trees_by_id(tree_id: str = Path(None, min_length=3, max_length=3)):
     try:
-        deleted_student_id, deleted_count = mongo_db.delete(student_id)
+        deleted_tree_id, deleted_count = mongo_db.delete(tree_id)
     except:
         raise HTTPException(status_code=500, detail="Something went wrong !!")
 
     if deleted_count == 0:
         raise HTTPException(
-            status_code=404, detail=f"Student Id: {deleted_student_id} is not Delete"
+            status_code=404, detail=f"Tree Id: {deleted_tree_id} is not Delete"
         )
 
     return JSONResponse(
         content={
             "status": "ok",
             "data": {
-                "student_id": deleted_student_id,
+                "tree_id": deleted_tree_id,
                 "deleted_count": deleted_count,
             },
         },

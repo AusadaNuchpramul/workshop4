@@ -6,6 +6,6 @@ config = {
         "password": "root",
         "auth_db": "admin",
         "db": "profile",
-        "collection": "student",
+        "collection": "shoptree",
     }
 }
