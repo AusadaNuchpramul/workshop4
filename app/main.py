@@ -39,7 +39,7 @@ def index():
 @app.get("/trees/")
 def get_trees(
     sort_by: Optional[str] = None,
-    order: Optional[str] = Query(None, min_length=3, max_length=3),
+    order: Optional[str] = Query(None, min_length=3, max_length=4),
 ):
 
     try:
